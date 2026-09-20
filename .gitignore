@@ -13,3 +13,48 @@
 .externalNativeBuild
 .cxx
 local.properties
+# Gradle
+.gradle/
+build/
+*/build/
+
+# Android Studio
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Local configuration
+local.properties
+
+# Generated files
+captures/
+.externalNativeBuild/
+.cxx/
+
+# APKs / App Bundles
+*.apk
+*.aab
+
+# Firebase
+# Do NOT commit your Firebase config if your team/project policy
+# requires keeping it private
+google-services.json
+
+# Keystore / signing files
+*.jks
+*.keystore
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.log
+
+# Kotlin
+.kotlin/
+
+# Navigation editor
+.navigation/
