@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="24dp"
+    android:background="#FFFFFF">
+
+    <!-- Welcome heading -->
+    <TextView
+        android:id="@+id/tvWelcome"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Welcome to Kliq!"
+        android:textSize="28sp"
+        android:textStyle="bold"
+        android:textColor="#222222" />
+
+    <!-- Tagline -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="Your moments, together."
+        android:textSize="16sp"
+        android:textColor="#666666" />
+
+    <!-- Create Event -->
+    <Button
+        android:id="@+id/btnCreateEvent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:text="Create Event" />
+
+    <!-- Join Event -->
+    <Button
+        android:id="@+id/btnJoinEvent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="Join Event" />
+
+    <!-- My Events -->
+    <Button
+        android:id="@+id/btnMyEvents"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="My Events" />
+
+    <!-- Log Out -->
+    <Button
+        android:id="@+id/btnLogout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="Log Out" />
+
+</LinearLayout>

@@ -55,6 +55,8 @@ public class LoginActivity extends AppCompatActivity {
                     .addOnCompleteListener(this, task -> {
                         if (task.isSuccessful()) {
                             Toast.makeText(LoginActivity.this, "Login successful!", Toast.LENGTH_SHORT).show();
+                            Intent i=new Intent(this,HomeActivity.class);
+                            startActivity(i);
                         } else {
                             Toast.makeText(LoginActivity.this, "Login failed: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
                         }
