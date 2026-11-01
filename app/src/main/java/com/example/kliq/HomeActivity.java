@@ -42,10 +42,27 @@ public class HomeActivity extends AppCompatActivity {
 
         loadUserName();
         Button btnCreateEvent = findViewById(R.id.btnCreateEvent);
+        Button btnJoinEvent = findViewById(R.id.btnJoinEvent);
+        Button btnMyEvents = findViewById(R.id.btnMyEvents);
+
+        btnMyEvents.setOnClickListener(v -> {
+            Intent intent = new Intent(
+                    HomeActivity.this,
+                    MyEventActivity.class
+            );
+            startActivity(intent);
+        });
 
         btnCreateEvent.setOnClickListener(v -> {
             Intent intent = new Intent(HomeActivity.this,
                     CreateEventActivity.class);
+            startActivity(intent);
+        });
+        btnJoinEvent.setOnClickListener(v -> {
+            Intent intent = new Intent(
+                    HomeActivity.this,
+                    JoinEventActivity.class
+            );
             startActivity(intent);
         });
 
