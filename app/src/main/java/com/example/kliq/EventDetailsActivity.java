@@ -53,10 +53,15 @@ public class EventDetailsActivity extends AppCompatActivity {
         btnCopyCode.setOnClickListener(v -> copyJoinCode());
 
         btnOpenGallery.setOnClickListener(v -> {
-            // We'll connect this to your teammate's GalleryActivity later.
-            Toast.makeText(this,
-                    "Gallery integration is coming next!",
-                    Toast.LENGTH_SHORT).show();
+
+            Intent intent = new Intent(
+                    EventDetailsActivity.this,
+                    GalleryActivity.class
+            );
+
+            intent.putExtra("eventId", eventId);
+
+            startActivity(intent);
         });
     }
 
