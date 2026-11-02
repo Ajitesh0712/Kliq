@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 import org.json.JSONObject;
 import org.json.JSONException;
@@ -46,7 +47,7 @@ public class GalleryActivity extends AppCompatActivity {
     private PhotoAdapter photoAdapter;
     private List<Photo> photoList;
     private Button btnUpload;
-
+    private TextView tvPhotoCount;
     private ActivityResultLauncher<String> photoPicker;
     private Uri pendingPhotoUri;
     @Override
@@ -116,6 +117,7 @@ public class GalleryActivity extends AppCompatActivity {
 
         recyclerPhotos = findViewById(R.id.recyclerPhotos);
         btnUpload = findViewById(R.id.btnUpload);
+        tvPhotoCount = findViewById(R.id.tvPhotoCount);
 
         btnUpload.setOnClickListener(v -> {
             photoPicker.launch("image/*");
@@ -130,23 +132,7 @@ public class GalleryActivity extends AppCompatActivity {
             return;
         }
         photoList = new ArrayList<>();
-        photoList.add(new Photo("1", null, null, null,
-                "android.resource://com.example.kliq/drawable/photo1", null));
 
-        photoList.add(new Photo("2", null, null, null,
-                "android.resource://com.example.kliq/drawable/photo2", null));
-
-        photoList.add(new Photo("3", null, null, null,
-                "android.resource://com.example.kliq/drawable/photo3", null));
-
-        photoList.add(new Photo("4", null, null, null,
-                "android.resource://com.example.kliq/drawable/photo4", null));
-
-        photoList.add(new Photo("5", null, null, null,
-                "android.resource://com.example.kliq/drawable/photo5", null));
-
-        photoList.add(new Photo("6", null, null, null,
-                "android.resource://com.example.kliq/drawable/photo6", null));
         // Display photos in three columns
         recyclerPhotos.setLayoutManager(
                 new GridLayoutManager(this, 3));
@@ -311,13 +297,22 @@ public class GalleryActivity extends AppCompatActivity {
                 .addSnapshotListener((snapshots, error) -> {
 
                     if (error != null) {
-                        Toast.makeText(this,
+                        Log.e(
+                                "KliqGallery",
+                                "Could not load photo metadata",
+                                error
+                        );
+
+                        Toast.makeText(
+                                this,
                                 "Could not load photos: " + error.getMessage(),
-                                Toast.LENGTH_LONG).show();
+                                Toast.LENGTH_LONG
+                        ).show();
+
                         return;
                     }
 
-                    if (snapshots == null) {
+                    if (snapshots == null || isFinishing() || isDestroyed()) {
                         return;
                     }
 
@@ -326,23 +321,46 @@ public class GalleryActivity extends AppCompatActivity {
                     for (com.google.firebase.firestore.DocumentSnapshot document
                             : snapshots.getDocuments()) {
 
+                        String storagePath = document.getString("storagePath");
+
                         Photo photo = new Photo(
                                 document.getId(),
                                 document.getString("uploadedBy"),
                                 null,
-                                document.getString("storagePath"),
+                                storagePath,
                                 null,
                                 document.getTimestamp("uploadedAt")
                         );
 
                         photoList.add(photo);
+
+                        // IMPORTANT: Request the actual image URL from Supabase.
+                        loadPhotoImage(photo);
+
+                        Log.d(
+                                "KliqGallery",
+                                "Photo found: id=" + document.getId()
+                                        + ", storagePath=" + storagePath
+                        );
                     }
 
                     photoAdapter.notifyDataSetChanged();
+                    int count = photoList.size();
+
+                    tvPhotoCount.setText(
+                            count + (count == 1 ? " photo" : " photos")
+                    );
+
+                    Log.d(
+                            "KliqGallery",
+                            "Photos loaded from Firestore: "
+                                    + photoList.size()
+                    );
                 });
     }
     private void loadPhotoImage(Photo photo) {
         if (currentUser == null) {
+            Log.e("KliqGallery", "No authenticated user");
             return;
         }
 
@@ -351,62 +369,131 @@ public class GalleryActivity extends AppCompatActivity {
                     String firebaseToken = tokenResult.getToken();
 
                     if (firebaseToken == null) {
+                        Log.e("KliqGallery", "Firebase token is null");
                         return;
                     }
 
                     executor.execute(() -> {
+                        HttpURLConnection connection = null;
+
                         try {
                             JSONObject requestBody = new JSONObject();
-                            requestBody.put("eventId", getIntent().getStringExtra("eventId"));
+                            requestBody.put(
+                                    "eventId",
+                                    getIntent().getStringExtra("eventId")
+                            );
                             requestBody.put("photoId", photo.getPhotoId());
+
                             URL url = new URL(SUPABASE_VIEW_URL);
-                            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                            connection = (HttpURLConnection) url.openConnection();
 
                             connection.setRequestMethod("POST");
-                            connection.setRequestProperty("Content-Type", "application/json");
-                            connection.setRequestProperty("Authorization", "Bearer " + firebaseToken);
+                            connection.setRequestProperty(
+                                    "Content-Type",
+                                    "application/json"
+                            );
+                            connection.setRequestProperty(
+                                    "Authorization",
+                                    "Bearer " + firebaseToken
+                            );
                             connection.setDoOutput(true);
                             connection.setConnectTimeout(15000);
                             connection.setReadTimeout(30000);
-                            try (OutputStream outputStream = connection.getOutputStream()) {
-                                outputStream.write(requestBody.toString().getBytes(StandardCharsets.UTF_8));
+
+                            try (OutputStream outputStream =
+                                         connection.getOutputStream()) {
+                                outputStream.write(
+                                        requestBody.toString()
+                                                .getBytes(StandardCharsets.UTF_8)
+                                );
                             }
+
                             int responseCode = connection.getResponseCode();
 
-                            InputStream responseStream = responseCode >= 200 && responseCode < 300
-                                    ? connection.getInputStream()
-                                    : connection.getErrorStream();
+                            InputStream responseStream =
+                                    responseCode >= 200 && responseCode < 300
+                                            ? connection.getInputStream()
+                                            : connection.getErrorStream();
 
-                            ByteArrayOutputStream responseBuffer = new ByteArrayOutputStream();
-                            byte[] responseBytes = new byte[4096];
-                            int responseLength;
+                            String responseText = "";
 
-                            while ((responseLength = responseStream.read(responseBytes)) != -1) {
-                                responseBuffer.write(responseBytes, 0, responseLength);
+                            if (responseStream != null) {
+                                try (ByteArrayOutputStream buffer =
+                                             new ByteArrayOutputStream()) {
+                                    byte[] bytes = new byte[4096];
+                                    int count;
+
+                                    while ((count = responseStream.read(bytes)) != -1) {
+                                        buffer.write(bytes, 0, count);
+                                    }
+
+                                    responseText = buffer.toString("UTF-8");
+                                }
                             }
 
-                            responseStream.close();
+                            Log.d(
+                                    "KliqGallery",
+                                    "View response code: " + responseCode
+                            );
+                            Log.d(
+                                    "KliqGallery",
+                                    "View response body: " + responseText
+                            );
 
-                            String responseText = responseBuffer.toString("UTF-8");
                             if (responseCode >= 200 && responseCode < 300) {
-                                JSONObject responseJson = new JSONObject(responseText);
+                                JSONObject responseJson =
+                                        new JSONObject(responseText);
 
-                                String imageUrl = responseJson.getString("imageUrl");
+                                String imageUrl =
+                                        responseJson.optString("imageUrl", "");
+
+                                if (imageUrl.trim().isEmpty()
+                                        || imageUrl.equals("null")) {
+                                    Log.e(
+                                            "KliqGallery",
+                                            "Response did not contain a valid imageUrl"
+                                    );
+                                    return;
+                                }
+
+                                Log.d(
+                                        "KliqGallery",
+                                        "Image URL received: " + imageUrl
+                                );
 
                                 photo.setImageUrl(imageUrl);
 
-                                runOnUiThread(() -> photoAdapter.notifyDataSetChanged());
+                                runOnUiThread(() -> {
+                                    if (!isFinishing() && !isDestroyed()) {
+                                        photoAdapter.notifyDataSetChanged();
+                                    }
+                                });
 
                             } else {
-                                Log.e("KliqGallery", "Photo view failed: " + responseText);
+                                Log.e(
+                                        "KliqGallery",
+                                        "Photo view request failed: " + responseText
+                                );
                             }
-                            connection.disconnect();
+
                         } catch (Exception e) {
-                            Log.e("KliqGallery", "Could not prepare photo request", e);
+                            Log.e(
+                                    "KliqGallery",
+                                    "Could not prepare photo request",
+                                    e
+                            );
+                        } finally {
+                            if (connection != null) {
+                                connection.disconnect();
+                            }
                         }
                     });
                 })
                 .addOnFailureListener(error ->
-                        Log.e("KliqGallery", "Could not get Firebase token", error));
+                        Log.e(
+                                "KliqGallery",
+                                "Could not get Firebase token",
+                                error
+                        ));
     }
 }
