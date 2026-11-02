@@ -67,6 +67,35 @@
             android:text="Copy Invite Code"
             android:textAllCaps="false"
             android:layout_marginTop="12dp" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="OR SCAN TO JOIN"
+            android:textColor="#777777"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_marginTop="28dp" />
+
+        <ImageView
+            android:id="@+id/ivJoinQRCode"
+            android:layout_width="190dp"
+            android:layout_height="190dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="12dp"
+            android:contentDescription="Event invitation QR code"
+            android:scaleType="fitCenter"
+            android:src="@android:drawable/ic_menu_gallery" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Scan this code to join the event"
+            android:textColor="#777777"
+            android:textSize="14sp"
+            android:gravity="center"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="24dp" />
 
         <TextView
             android:id="@+id/tvMemberCount"

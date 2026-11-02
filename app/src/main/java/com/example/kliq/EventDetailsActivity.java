@@ -8,7 +8,8 @@ import android.os.Bundle;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-
+import android.graphics.Bitmap;
+import android.widget.ImageView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -18,7 +19,7 @@ public class EventDetailsActivity extends AppCompatActivity {
 
     private TextView tvEventName, tvJoinCode, tvMemberCount;
     private Button btnCopyCode, btnOpenGallery;
-
+    private ImageView ivJoinQRCode;
     private FirebaseFirestore db;
     private String eventId;
     private String joinCode;
@@ -35,7 +36,7 @@ public class EventDetailsActivity extends AppCompatActivity {
         tvMemberCount = findViewById(R.id.tvMemberCount);
         btnCopyCode = findViewById(R.id.btnCopyCode);
         btnOpenGallery = findViewById(R.id.btnOpenGallery);
-
+        ivJoinQRCode = findViewById(R.id.ivJoinQRCode);
         db = FirebaseFirestore.getInstance();
 
         eventId = getIntent().getStringExtra("eventId");
@@ -88,9 +89,29 @@ public class EventDetailsActivity extends AppCompatActivity {
                             joinCode != null ? joinCode : "Unavailable"
                     );
 
-                    btnCopyCode.setEnabled(
-                            joinCode != null && !joinCode.isEmpty()
-                    );
+                    boolean validJoinCode =
+                            joinCode != null && !joinCode.trim().isEmpty();
+
+                    btnCopyCode.setEnabled(validJoinCode);
+
+                    if (validJoinCode) {
+                        Bitmap qrBitmap = QRCodeHelper.generateQRCode(
+                                joinCode.trim(),
+                                600
+                        );
+
+                        if (qrBitmap != null) {
+                            ivJoinQRCode.setImageBitmap(qrBitmap);
+                        } else {
+                            Toast.makeText(
+                                    EventDetailsActivity.this,
+                                    "Could not generate QR code",
+                                    Toast.LENGTH_SHORT
+                            ).show();
+                        }
+                    } else {
+                        ivJoinQRCode.setImageDrawable(null);
+                    }
                 })
                 .addOnFailureListener(e ->
                         Toast.makeText(this,

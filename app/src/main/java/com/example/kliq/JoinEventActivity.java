@@ -8,6 +8,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
+import androidx.activity.result.ActivityResultLauncher;
+
+import com.journeyapps.barcodescanner.ScanContract;
+import com.journeyapps.barcodescanner.ScanOptions;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -30,6 +34,38 @@ public class JoinEventActivity extends AppCompatActivity {
 
     private FirebaseAuth auth;
     private FirebaseFirestore db;
+    private Button btnScanQR;
+
+    private final ActivityResultLauncher<ScanOptions> qrScannerLauncher =
+            registerForActivityResult(
+                    new ScanContract(),
+                    result -> {
+                        if (result.getContents() == null) {
+                            Toast.makeText(
+                                    JoinEventActivity.this,
+                                    "QR scanning cancelled",
+                                    Toast.LENGTH_SHORT
+                            ).show();
+                            return;
+                        }
+
+                        String scannedCode = result.getContents()
+                                .trim()
+                                .toUpperCase(Locale.ROOT);
+
+                        if (!scannedCode.matches("[A-F0-9]{8}")) {
+                            Toast.makeText(
+                                    JoinEventActivity.this,
+                                    "Invalid QR code. Please scan a Kliq invitation QR code.",
+                                    Toast.LENGTH_LONG
+                            ).show();
+                            return;
+                        }
+
+                        etJoinCode.setText(scannedCode);
+                        joinEvent();
+                    }
+            );
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,11 +75,24 @@ public class JoinEventActivity extends AppCompatActivity {
         etJoinCode = findViewById(R.id.etJoinCode);
         btnJoinEvent = findViewById(R.id.btnJoinEvent);
         progressBar = findViewById(R.id.progressBar);
+        btnScanQR = findViewById(R.id.btnScanQR);
+
 
         auth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
 
         btnJoinEvent.setOnClickListener(v -> joinEvent());
+        btnJoinEvent.setOnClickListener(v -> joinEvent());
+        btnScanQR.setOnClickListener(v -> {
+            ScanOptions options = new ScanOptions();
+
+            options.setPrompt("Scan the event invitation QR code");
+            options.setBeepEnabled(true);
+            options.setOrientationLocked(false);
+            options.setDesiredBarcodeFormats(ScanOptions.QR_CODE);
+
+            qrScannerLauncher.launch(options);
+        });
     }
 
     private void joinEvent() {
@@ -269,12 +318,12 @@ public class JoinEventActivity extends AppCompatActivity {
     }
 
     private void setLoading(boolean loading) {
-
         progressBar.setVisibility(
                 loading ? View.VISIBLE : View.GONE
         );
 
         btnJoinEvent.setEnabled(!loading);
+        btnScanQR.setEnabled(!loading);
         etJoinCode.setEnabled(!loading);
     }
 }
