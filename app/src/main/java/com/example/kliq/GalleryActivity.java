@@ -1,5 +1,6 @@
 
 package com.example.kliq;
+import android.content.Intent;
 import android.util.Base64;
 import android.net.Uri;
 import android.os.Bundle;
@@ -137,7 +138,32 @@ public class GalleryActivity extends AppCompatActivity {
         recyclerPhotos.setLayoutManager(
                 new GridLayoutManager(this, 3));
 
-        photoAdapter = new PhotoAdapter(this, photoList);
+        photoAdapter = new PhotoAdapter(this, photoList, position -> {
+            ArrayList<String> urls = new ArrayList<>();
+            int selectedIndex = -1;
+
+            for (int i = 0; i < photoList.size(); i++) {
+                String url = photoList.get(i).getImageUrl();
+
+                if (url != null && !url.trim().isEmpty()) {
+                    if (i == position) {
+                        selectedIndex = urls.size();
+                    }
+                    urls.add(url);
+                }
+            }
+
+            if (selectedIndex == -1) {
+                Toast.makeText(this, "Photo is still loading. Please try again.",
+                        Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            Intent intent = new Intent(GalleryActivity.this, PhotoViewerActivity.class);
+            intent.putStringArrayListExtra("photoUrls", urls);
+            intent.putExtra("startPosition", selectedIndex);
+            startActivity(intent);
+        });
 
         recyclerPhotos.setAdapter(photoAdapter);
         loadPhotos(eventId);

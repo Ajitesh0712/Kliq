@@ -67,6 +67,9 @@
             android:name=".MyEventActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".PhotoViewerActivity"
+            android:exported="false" />
     </application>
 
 </manifest>
