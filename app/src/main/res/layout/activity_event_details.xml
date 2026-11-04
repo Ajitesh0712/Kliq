@@ -115,6 +115,15 @@
             android:textAllCaps="false"
             android:backgroundTint="#7048E8"
             android:textColor="#FFFFFF" />
+        <Button
+            android:id="@+id/btnLeaveEvent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Leave Event"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white"
+            android:backgroundTint="#D32F2F" />
 
     </LinearLayout>
 
