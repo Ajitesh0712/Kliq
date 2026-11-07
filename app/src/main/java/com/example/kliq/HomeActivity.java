@@ -40,11 +40,13 @@ public class HomeActivity extends AppCompatActivity {
                 MODE_PRIVATE
         );
 
-        loadUserName();
         Button btnCreateEvent = findViewById(R.id.btnCreateEvent);
         Button btnJoinEvent = findViewById(R.id.btnJoinEvent);
         Button btnMyEvents = findViewById(R.id.btnMyEvents);
 
+        loadUserName();
+
+        // MY EVENTS
         btnMyEvents.setOnClickListener(v -> {
             Intent intent = new Intent(
                     HomeActivity.this,
@@ -53,11 +55,16 @@ public class HomeActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
+        // CREATE EVENT
         btnCreateEvent.setOnClickListener(v -> {
-            Intent intent = new Intent(HomeActivity.this,
-                    CreateEventActivity.class);
+            Intent intent = new Intent(
+                    HomeActivity.this,
+                    CreateEventActivity.class
+            );
             startActivity(intent);
         });
+
+        // JOIN EVENT
         btnJoinEvent.setOnClickListener(v -> {
             Intent intent = new Intent(
                     HomeActivity.this,
@@ -66,14 +73,16 @@ public class HomeActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
+        // LOGOUT
         btnLogout.setOnClickListener(v -> logoutUser());
     }
+
+    // LOAD USER NAME
 
     private void loadUserName() {
 
         FirebaseUser currentUser = mAuth.getCurrentUser();
 
-        // Check whether a user is logged in.
         if (currentUser == null) {
             redirectToLogin();
             return;
@@ -81,10 +90,10 @@ public class HomeActivity extends AppCompatActivity {
 
         currentUid = currentUser.getUid();
 
-        // Use a separate cache key for each user's UID.
         String cacheKey = "userName_" + currentUid;
 
-        // Display the cached name immediately, if available.
+        // Display cached name immediately.
+
         String cachedName = preferences.getString(cacheKey, null);
 
         if (cachedName != null && !cachedName.trim().isEmpty()) {
@@ -93,13 +102,13 @@ public class HomeActivity extends AppCompatActivity {
             tvWelcome.setText("Welcome to Kliq!");
         }
 
-        // Fetch the latest profile from Firestore.
+        // Fetch latest profile from Firestore.
+
         db.collection("users")
                 .document(currentUid)
                 .get()
                 .addOnSuccessListener(document -> {
 
-                    // Ignore the result if the account changed.
                     FirebaseUser latestUser = mAuth.getCurrentUser();
 
                     if (latestUser == null ||
@@ -113,10 +122,8 @@ public class HomeActivity extends AppCompatActivity {
 
                         if (name != null && !name.trim().isEmpty()) {
 
-                            // Update the welcome message.
                             tvWelcome.setText("Welcome, " + name + "!");
 
-                            // Save the name for the next launch.
                             preferences.edit()
                                     .putString(cacheKey, name)
                                     .apply();
@@ -131,7 +138,6 @@ public class HomeActivity extends AppCompatActivity {
                 })
                 .addOnFailureListener(e -> {
 
-                    // Keep the cached name if the network request fails.
                     FirebaseUser latestUser = mAuth.getCurrentUser();
 
                     if (latestUser == null ||
@@ -155,14 +161,16 @@ public class HomeActivity extends AppCompatActivity {
                 });
     }
 
+    // LOGOUT
+
     private void logoutUser() {
 
-        // Sign out the current user.
         mAuth.signOut();
 
-        // Clear the activity stack and return to LoginActivity.
         redirectToLogin();
     }
+
+    // REDIRECT TO LOGIN
 
     private void redirectToLogin() {
 

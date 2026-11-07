@@ -106,11 +106,14 @@ public class GalleryActivity extends AppCompatActivity {
                     Insets systemBars = insets.getInsets(
                             WindowInsetsCompat.Type.systemBars());
 
+                    int padding = (int) (16 * getResources()
+                            .getDisplayMetrics().density);
+
                     v.setPadding(
-                            systemBars.left,
-                            systemBars.top,
-                            systemBars.right,
-                            systemBars.bottom
+                            systemBars.left + padding,
+                            systemBars.top + padding,
+                            systemBars.right + padding,
+                            systemBars.bottom + padding
                     );
 
                     return insets;

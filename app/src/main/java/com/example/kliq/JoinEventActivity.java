@@ -81,7 +81,7 @@ public class JoinEventActivity extends AppCompatActivity {
         auth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
 
-        btnJoinEvent.setOnClickListener(v -> joinEvent());
+
         btnJoinEvent.setOnClickListener(v -> joinEvent());
         btnScanQR.setOnClickListener(v -> {
             ScanOptions options = new ScanOptions();

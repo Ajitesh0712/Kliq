@@ -1,69 +1,144 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
-    android:background="#F7F7FB">
+    android:background="#0B0B0B"
+    android:scrollbars="none">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:orientation="vertical"
         android:padding="24dp"
         android:gravity="center_vertical">
+
+        <!-- HEADER -->
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="KLIQ"
+            android:textColor="#FFFFFF"
+            android:textSize="25sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.12" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="JOIN THE MOMENT"
+            android:textColor="#999999"
+            android:textSize="11sp"
+            android:letterSpacing="0.15"
+            android:layout_marginTop="42dp" />
+
+        <!-- TITLE -->
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Join an Event"
-            android:textSize="28sp"
+            android:textSize="30sp"
             android:textStyle="bold"
-            android:textColor="#202124"
-            android:layout_marginBottom="8dp" />
+            android:textColor="#FFFFFF"
+            android:layout_marginTop="10dp" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Enter the invite code shared by the event creator."
-            android:textSize="16sp"
-            android:textColor="#666666"
-            android:layout_marginBottom="28dp" />
+            android:text="Enter the invitation code shared by the event creator to join their gallery."
+            android:textSize="14sp"
+            android:textColor="#A3A3A3"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="30dp" />
+
+        <!-- INVITE CODE -->
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="INVITATION CODE"
+            android:textColor="#999999"
+            android:textSize="11sp"
+            android:letterSpacing="0.12"
+            android:layout_marginBottom="10dp" />
 
         <EditText
             android:id="@+id/etJoinCode"
             android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:hint="Enter invite code"
+            android:layout_height="58dp"
+            android:hint="ENTER 8-CHARACTER CODE"
             android:inputType="textCapCharacters"
             android:singleLine="true"
             android:maxLength="8"
-            android:padding="14dp"
-            android:textColor="#202124"
-            android:textColorHint="#888888"
-            android:backgroundTint="#6750A4" />
+            android:padding="16dp"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#777777"
+            android:textSize="15sp"
+            android:letterSpacing="0.08"
+            android:backgroundTint="#FFFFFF" />
+
+        <!-- JOIN BUTTON -->
 
         <Button
             android:id="@+id/btnJoinEvent"
             android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="24dp"
+            android:text="Join Event   →"
+            android:textColor="#000000"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:textAllCaps="false"
+            android:backgroundTint="#FFFFFF"
+            android:stateListAnimator="@null" />
+
+        <!-- DIVIDER LABEL -->
+
+        <TextView
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:text="Join Event"
-            android:textAllCaps="false" />
+            android:text="OR"
+            android:textColor="#777777"
+            android:textSize="11sp"
+            android:gravity="center"
+            android:layout_marginTop="26dp"
+            android:layout_marginBottom="20dp" />
+
+        <!-- QR SCANNER -->
+
         <Button
             android:id="@+id/btnScanQR"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
+            android:layout_height="54dp"
             android:text="Scan QR Code"
-            android:textAllCaps="false" />
+            android:textColor="#FFFFFF"
+            android:textSize="14sp"
+            android:textAllCaps="false"
+            android:backgroundTint="#292929"
+            android:stateListAnimator="@null" />
+
+        <!-- LOADING -->
 
         <ProgressBar
             android:id="@+id/progressBar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="24dp"
+            android:indeterminateTint="#FFFFFF"
             android:visibility="gone" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Good moments are better shared."
+            android:textColor="#777777"
+            android:textSize="12sp"
+            android:gravity="center"
+            android:layout_marginTop="42dp" />
 
     </LinearLayout>
 
