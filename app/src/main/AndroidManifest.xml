@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.CAMERA" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -11,6 +14,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Kliq">
+
+        <!-- Launcher Activity -->
         <activity
             android:name=".SplashActivity"
             android:exported="true"
@@ -21,9 +26,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".MainActivity"
-            android:exported="false" />
+
+        <!-- Authentication -->
         <activity
             android:name=".LoginActivity"
             android:exported="false"
@@ -32,6 +36,40 @@
             android:name=".SignupActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+
+        <!-- Home -->
+        <activity
+            android:name=".HomeActivity"
+            android:exported="false" />
+        <activity
+            android:name=".MainActivity"
+            android:exported="false" />
+
+        <!-- Events -->
+        <activity
+            android:name=".CreateEventActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".EventDetailsActivity"
+            android:exported="false" />
+
+        <!-- Gallery -->
+        <activity
+            android:name=".GalleryActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".JoinEventActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".MyEventActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".PhotoViewerActivity"
+            android:exported="false" />
     </application>
 
 </manifest>

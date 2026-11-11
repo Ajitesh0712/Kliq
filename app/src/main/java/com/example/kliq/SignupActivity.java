@@ -1,5 +1,6 @@
 package com.example.kliq;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
@@ -8,6 +9,11 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class SignupActivity extends AppCompatActivity {
 
@@ -15,6 +21,7 @@ public class SignupActivity extends AppCompatActivity {
     Button signupButton;
 
     FirebaseAuth mAuth;
+    FirebaseFirestore db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +35,7 @@ public class SignupActivity extends AppCompatActivity {
         signupButton = findViewById(R.id.signupButton);
 
         mAuth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
 
         signupButton.setOnClickListener(v -> {
 
@@ -52,10 +60,17 @@ public class SignupActivity extends AppCompatActivity {
                 return;
             }
 
+            if (passwordText.length() < 6) {
+                password.setError("Password must be at least 6 characters");
+                return;
+            }
+
             if (!passwordText.equals(confirmPasswordText)) {
                 confirmPassword.setError("Passwords do not match");
                 return;
             }
+
+            signupButton.setEnabled(false);
 
             mAuth.createUserWithEmailAndPassword(
                     emailText,
@@ -64,11 +79,43 @@ public class SignupActivity extends AppCompatActivity {
 
                 if (task.isSuccessful()) {
 
-                    Toast.makeText(
-                            SignupActivity.this,
-                            "Account created!",
-                            Toast.LENGTH_SHORT
-                    ).show();
+                    String uid = mAuth.getCurrentUser().getUid();
+
+                    Map<String, Object> user = new HashMap<>();
+                    user.put("name", nameText);
+                    user.put("email", emailText);
+                    user.put("createdAt", FieldValue.serverTimestamp());
+
+                    db.collection("users")
+                            .document(uid)
+                            .set(user)
+                            .addOnSuccessListener(unused -> {
+
+                                Toast.makeText(
+                                        SignupActivity.this,
+                                        "Account and profile created!",
+                                        Toast.LENGTH_SHORT
+                                ).show();
+
+                                Intent intent = new Intent(
+                                        SignupActivity.this,
+                                        HomeActivity.class
+                                );
+
+                                startActivity(intent);
+                                finish();
+                            })
+                            .addOnFailureListener(e -> {
+
+                                Toast.makeText(
+                                        SignupActivity.this,
+                                        "Account created, but profile saving failed: "
+                                                + e.getMessage(),
+                                        Toast.LENGTH_LONG
+                                ).show();
+
+                                signupButton.setEnabled(true);
+                            });
 
                 } else {
 
@@ -78,6 +125,8 @@ public class SignupActivity extends AppCompatActivity {
                                     + task.getException().getMessage(),
                             Toast.LENGTH_LONG
                     ).show();
+
+                    signupButton.setEnabled(true);
                 }
             });
         });

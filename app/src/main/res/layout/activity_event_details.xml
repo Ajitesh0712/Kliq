@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#0B0B0B"
+    android:fillViewport="true"
+    android:scrollbars="none">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <!-- HEADER -->
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="YOUR COLLECTION"
+            android:textColor="#999999"
+            android:textSize="11sp"
+            android:letterSpacing="0.15" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Event Details"
+            android:textColor="#FFFFFF"
+            android:textSize="30sp"
+            android:textStyle="bold"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="28dp" />
+
+        <!-- EVENT NAME -->
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="EVENT NAME"
+            android:textColor="#999999"
+            android:textSize="11sp"
+            android:letterSpacing="0.12" />
+
+        <TextView
+            android:id="@+id/tvEventName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Loading event..."
+            android:textColor="#FFFFFF"
+            android:textSize="25sp"
+            android:textStyle="bold"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="30dp" />
+
+        <!-- INVITATION CODE -->
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="INVITE PEOPLE"
+            android:textColor="#999999"
+            android:textSize="11sp"
+            android:letterSpacing="0.12" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Share this code with your friends"
+            android:textColor="#A3A3A3"
+            android:textSize="14sp"
+            android:layout_marginTop="6dp" />
+
+        <TextView
+            android:id="@+id/tvJoinCode"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="--------"
+            android:textColor="#FFFFFF"
+            android:textSize="30sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.12"
+            android:padding="22dp"
+            android:layout_marginTop="14dp"
+            android:background="#202020" />
+
+        <Button
+            android:id="@+id/btnCopyCode"
+            android:layout_width="match_parent"
+            android:layout_height="54dp"
+            android:layout_marginTop="12dp"
+            android:text="Copy Invite Code"
+            android:textColor="#000000"
+            android:textSize="14sp"
+            android:textAllCaps="false"
+            android:backgroundTint="#FFFFFF"
+            android:stateListAnimator="@null" />
+
+        <!-- QR CODE -->
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="OR SCAN TO JOIN"
+            android:textColor="#999999"
+            android:textSize="11sp"
+            android:letterSpacing="0.12"
+            android:gravity="center"
+            android:layout_marginTop="34dp" />
+
+        <ImageView
+            android:id="@+id/ivJoinQRCode"
+            android:layout_width="210dp"
+            android:layout_height="210dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="18dp"
+            android:padding="12dp"
+            android:background="#FFFFFF"
+            android:contentDescription="Event invitation QR code"
+            android:scaleType="fitCenter"
+            android:src="@android:drawable/ic_menu_gallery" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Scan this code to join the event"
+            android:textColor="#A3A3A3"
+            android:textSize="13sp"
+            android:gravity="center"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="30dp" />
+
+        <!-- MEMBER COUNT -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="18dp"
+            android:background="#202020">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="EVENT COMMUNITY"
+                android:textColor="#999999"
+                android:textSize="10sp"
+                android:letterSpacing="0.12" />
+
+            <TextView
+                android:id="@+id/tvMemberCount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Members: 1"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginTop="8dp" />
+
+        </LinearLayout>
+
+        <!-- GALLERY BUTTON -->
+
+        <Button
+            android:id="@+id/btnOpenGallery"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="26dp"
+            android:text="Open Gallery   →"
+            android:textColor="#000000"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:textAllCaps="false"
+            android:backgroundTint="#FFFFFF"
+            android:stateListAnimator="@null" />
+
+        <!-- LEAVE EVENT -->
+
+        <Button
+            android:id="@+id/btnLeaveEvent"
+            android:layout_width="match_parent"
+            android:layout_height="54dp"
+            android:layout_marginTop="14dp"
+            android:layout_marginBottom="20dp"
+            android:text="Leave Event"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp"
+            android:textAllCaps="false"
+            android:backgroundTint="#303030"
+            android:stateListAnimator="@null" />
+
+    </LinearLayout>
+
+</ScrollView>
