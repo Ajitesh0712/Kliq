@@ -1,3 +1,4 @@
+
 package com.example.kliq;
 
 import android.content.Intent;
@@ -21,7 +22,9 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 public class MyEventActivity extends AppCompatActivity {
 
@@ -31,6 +34,9 @@ public class MyEventActivity extends AppCompatActivity {
     private LinearLayout eventsContainer;
     private ProgressBar progressBar;
     private TextView tvEmpty;
+
+    // Prevents older Firestore requests from rendering stale results.
+    private int loadGeneration = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,7 +55,7 @@ public class MyEventActivity extends AppCompatActivity {
             return;
         }
 
-        loadMyEvents();
+        // Initial loading happens in onResume().
     }
 
     private int dp(float value) {
@@ -64,10 +70,14 @@ public class MyEventActivity extends AppCompatActivity {
             return;
         }
 
+        // Every new load invalidates previous pending loads.
+        final int currentGeneration = ++loadGeneration;
+
         String uid = auth.getCurrentUser().getUid();
 
         progressBar.setVisibility(View.VISIBLE);
         tvEmpty.setVisibility(View.GONE);
+
         eventsContainer.removeAllViews();
 
         db.collection("users")
@@ -76,9 +86,13 @@ public class MyEventActivity extends AppCompatActivity {
                 .get()
                 .addOnSuccessListener(joinedEvents -> {
 
-                    if (isFinishing() || isDestroyed()) return;
+                    if (isFinishing() || isDestroyed()
+                            || currentGeneration != loadGeneration) {
+                        return;
+                    }
 
-                    List<String> eventIds = new ArrayList<>();
+                    // LinkedHashSet prevents duplicate event IDs.
+                    Set<String> uniqueEventIds = new LinkedHashSet<>();
 
                     for (DocumentSnapshot document : joinedEvents) {
 
@@ -88,10 +102,13 @@ public class MyEventActivity extends AppCompatActivity {
                             eventId = document.getId();
                         }
 
-                        if (!eventIds.contains(eventId)) {
-                            eventIds.add(eventId);
+                        if (eventId != null && !eventId.trim().isEmpty()) {
+                            uniqueEventIds.add(eventId);
                         }
                     }
+
+                    List<String> eventIds =
+                            new ArrayList<>(uniqueEventIds);
 
                     if (eventIds.isEmpty()) {
                         progressBar.setVisibility(View.GONE);
@@ -99,14 +116,26 @@ public class MyEventActivity extends AppCompatActivity {
                         return;
                     }
 
-                    loadEventDetails(eventIds, uid);
+                    loadEventDetails(
+                            eventIds,
+                            uid,
+                            currentGeneration
+                    );
                 })
                 .addOnFailureListener(e -> {
 
+                    if (isFinishing() || isDestroyed()
+                            || currentGeneration != loadGeneration) {
+                        return;
+                    }
+
                     progressBar.setVisibility(View.GONE);
 
-                    Log.e("MyEventActivity",
-                            "Failed to load joinedEvents index", e);
+                    Log.e(
+                            "MyEventActivity",
+                            "Failed to load joinedEvents index",
+                            e
+                    );
 
                     Toast.makeText(
                             MyEventActivity.this,
@@ -116,10 +145,17 @@ public class MyEventActivity extends AppCompatActivity {
                 });
     }
 
-    private void loadEventDetails(List<String> eventIds, String uid) {
+    private void loadEventDetails(
+            List<String> eventIds,
+            String uid,
+            int currentGeneration
+    ) {
 
         final int[] completed = {0};
         final int total = eventIds.size();
+
+        // Additional protection against duplicate card rendering.
+        Set<String> renderedEventIds = new LinkedHashSet<>();
 
         for (String eventId : eventIds) {
 
@@ -128,9 +164,13 @@ public class MyEventActivity extends AppCompatActivity {
                     .get()
                     .addOnSuccessListener(event -> {
 
-                        if (isFinishing() || isDestroyed()) return;
+                        if (isFinishing() || isDestroyed()
+                                || currentGeneration != loadGeneration) {
+                            return;
+                        }
 
-                        if (event.exists()) {
+                        if (event.exists()
+                                && renderedEventIds.add(eventId)) {
 
                             String name = event.getString("name");
                             String createdBy = event.getString("createdBy");
@@ -145,20 +185,46 @@ public class MyEventActivity extends AppCompatActivity {
                         }
 
                         completed[0]++;
-                        finishLoadingIfDone(completed[0], total);
+
+                        finishLoadingIfDone(
+                                completed[0],
+                                total,
+                                currentGeneration
+                        );
                     })
                     .addOnFailureListener(e -> {
 
-                        Log.e("MyEventActivity",
-                                "Failed to load event: " + eventId, e);
+                        if (isFinishing() || isDestroyed()
+                                || currentGeneration != loadGeneration) {
+                            return;
+                        }
+
+                        Log.e(
+                                "MyEventActivity",
+                                "Failed to load event: " + eventId,
+                                e
+                        );
 
                         completed[0]++;
-                        finishLoadingIfDone(completed[0], total);
+
+                        finishLoadingIfDone(
+                                completed[0],
+                                total,
+                                currentGeneration
+                        );
                     });
         }
     }
 
-    private void finishLoadingIfDone(int completed, int total) {
+    private void finishLoadingIfDone(
+            int completed,
+            int total,
+            int currentGeneration
+    ) {
+
+        if (currentGeneration != loadGeneration) {
+            return;
+        }
 
         if (completed == total) {
 
@@ -183,6 +249,7 @@ public class MyEventActivity extends AppCompatActivity {
 
         LinearLayout card = new LinearLayout(this);
         card.setOrientation(LinearLayout.VERTICAL);
+
         card.setPadding(
                 dp(22), dp(22),
                 dp(22), dp(20)
@@ -216,6 +283,7 @@ public class MyEventActivity extends AppCompatActivity {
         // ROLE
 
         TextView tvRole = new TextView(this);
+
         tvRole.setText(
                 isAdmin
                         ? "ADMIN  •  CREATED BY YOU"
@@ -302,10 +370,20 @@ public class MyEventActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        // Refresh events when returning to this screen.
-        if (eventsContainer != null && auth != null
-                && auth.getCurrentUser() != null) {
+        // Refresh events whenever this screen becomes visible.
+        if (eventsContainer != null &&
+                auth != null &&
+                auth.getCurrentUser() != null) {
+
             loadMyEvents();
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        // Invalidate any pending Firestore callbacks.
+        loadGeneration++;
+
+        super.onDestroy();
     }
 }

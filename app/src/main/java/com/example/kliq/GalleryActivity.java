@@ -141,32 +141,57 @@ public class GalleryActivity extends AppCompatActivity {
         recyclerPhotos.setLayoutManager(
                 new GridLayoutManager(this, 3));
 
+
+
         photoAdapter = new PhotoAdapter(this, photoList, position -> {
+
             ArrayList<String> urls = new ArrayList<>();
+            ArrayList<String> photoIds = new ArrayList<>();
+            ArrayList<String> photoUploaderIds = new ArrayList<>();
+
             int selectedIndex = -1;
 
             for (int i = 0; i < photoList.size(); i++) {
-                String url = photoList.get(i).getImageUrl();
 
-                if (url != null && !url.trim().isEmpty()) {
+                Photo photo = photoList.get(i);
+                String imageUrl = photo.getImageUrl();
+
+                if (imageUrl != null && !imageUrl.trim().isEmpty()) {
+
                     if (i == position) {
                         selectedIndex = urls.size();
                     }
-                    urls.add(url);
+
+                    urls.add(imageUrl);
+                    photoIds.add(photo.getPhotoId());
+                    photoUploaderIds.add(photo.getUploadedBy());
                 }
             }
 
             if (selectedIndex == -1) {
-                Toast.makeText(this, "Photo is still loading. Please try again.",
-                        Toast.LENGTH_SHORT).show();
+                Toast.makeText(
+                        this,
+                        "Photo is still loading. Please try again.",
+                        Toast.LENGTH_SHORT
+                ).show();
                 return;
             }
 
-            Intent intent = new Intent(GalleryActivity.this, PhotoViewerActivity.class);
+            Intent intent = new Intent(
+                    GalleryActivity.this,
+                    PhotoViewerActivity.class
+            );
+
             intent.putStringArrayListExtra("photoUrls", urls);
+            intent.putStringArrayListExtra("photoIds", photoIds);
+            intent.putStringArrayListExtra("photoUploaderIds", photoUploaderIds);
+            intent.putExtra("eventId", eventId);
             intent.putExtra("startPosition", selectedIndex);
+
             startActivity(intent);
         });
+
+
 
         recyclerPhotos.setAdapter(photoAdapter);
         loadPhotos(eventId);
